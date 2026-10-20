@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tri Ân 20/10 - Chúc Mừng Ngày Phụ Nữ Việt Nam</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Lớp background giàu chi tiết: Các đốm sáng Bokeh đa sắc & Vòng hoa văn thanh xuân -->
+  <div class="ambient-background-layer">
+    <div class="bokeh-orb orb-1"></div>
+    <div class="bokeh-orb orb-2"></div>
+    <div class="bokeh-orb orb-3"></div>
+    <div class="bokeh-orb orb-4"></div>
+    <div class="floral-watermark-wreath">
+      <div class="floral-watermark-inner"></div>
+    </div>
+  </div>
+
+  <!-- Canvas bão hoa bay chéo vụt qua khi chuyển cảnh -->
+  <canvas id="gust-canvas"></canvas>
+
+  <!-- Canvas cánh hoa & trái tim 3D rơi nền thường ngày -->
+  <canvas id="petals-canvas"></canvas>
+
+  <!-- Thanh công cụ nhanh góc trên bên phải -->
+  <div class="top-action-bar">
+    <button id="toggle-music-btn" class="action-btn" onclick="toggleBackgroundMusic()" title="Bật/Tắt nhạc nền du dương">
+      <span>🎵</span> Bật Nhạc
+    </button>
+  </div>
+
+  <!-- Header chính lộng lẫy -->
+  <header class="main-header">
+    <div class="header-badge">
+      <span>✦</span> LỚP 11B2 • NGÀY PHỤ NỮ VIỆT NAM 20/10 <span>✦</span>
+    </div>
+    <h1 class="main-title">Những Đóa Hoa Rạng Rỡ Của Thanh Xuân</h1>
+    <p class="main-subtitle">
+      Tháng Mười về mang theo những yêu thương và thông điệp tri an chân thành gửi tới Bố Mẹ kính yêu!
+    </p>
+  </header>
+
+  <!-- Container thân ứng dụng -->
+  <main class="app-container">
+
+    <!-- ====================================================================
+         MÀN HÌNH 1: BỨC ẢNH TẬP THỂ INTRO
+         - Ảnh chuyển động 3D theo hướng chuột
+         - Đèn rọi Spotlight Canvas 2D siêu tốc 0ms: Cắt lỗ sáng rực rỡ, KHÔNG BỊ MỜ,
+           khuôn mặt học sinh sáng bừng tức thì không cần chờ load
+         ==================================================================== -->
+    <section id="intro-view" class="view-section active-view">
+      <div class="intro-wrapper">
+        
+        <!-- Thanh tùy chọn chế độ hòa sắc -->
+        <div class="intro-toolbar">
+          <div class="view-mode-toggle">
+            <button id="mode-blend-btn" class="mode-btn active" title="Hòa sắc bối cảnh nhẹ nhàng 20/10">
+              🌸 Hòa Sắc 20/10
+            </button>
+            <button id="mode-orig-btn" class="mode-btn" title="Xem ảnh gốc ban đầu">
+              🖼️ Ảnh Gốc
+            </button>
+          </div>
+          <div class="hint-pill">
+            <span>✨</span> Rê chuột ngắm ảnh 3D & chạm vào từng người để rọi sáng lắng nghe lời chúc!
+          </div>
+        </div>
+
+        <!-- Khung ảnh có hiệu ứng xoay nghiêng 3D theo hướng chuột -->
+        <div id="photo-stage" class="photo-stage">
+          <div id="photo-tilt-container" class="photo-tilt-container">
+            <div class="stage-aura"></div>
+            
+            <!-- Bức ảnh gốc sắc nét -->
+            <img id="group-photo-img" class="group-image blended-mode" src="assets/original.jpg" alt="Ảnh kỷ niệm tập thể lớp" />
+            
+            <!-- Canvas rọi đèn Spotlight 2D siêu tốc: Cắt lỗ sáng rực rỡ, không bị mờ -->
+            <canvas id="spotlight-canvas"></canvas>
+
+            <!-- Hào quang ánh kim viền quanh người được chọn -->
+            <div id="person-halo" class="person-halo"></div>
+
+            <!-- Vùng tương tác vô hình -->
+            <div id="hotspots-layer" class="hotspots-layer"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         MÀN HÌNH 2: RẠP CHIẾU VIDEO NGHỆ THUẬT
+         - Đã bỏ lời chúc trên mỗi video, tập trung vào khung video hoàng gia
+         ==================================================================== -->
+    <section id="theater-view" class="view-section">
+      <div class="video-theater-wrapper">
+        
+        <!-- Chi tiết 1: Thanh điều hướng quay lại -->
+        <div class="theater-top-nav stagger-1">
+          <button class="back-to-group-btn" onclick="backToGroupIntro()">
+            <span>⬅</span> Quay lại ảnh tập thể
+          </button>
+          <div id="theater-page-count" class="theater-page-counter">
+            Trang 1 / 35
+          </div>
+        </div>
+
+        <div class="video-stage-center">
+
+          <!-- Chi tiết 2: Banner tên học sinh trang trọng (Đã bỏ khối lời chúc) -->
+          <div class="student-header-banner stagger-2">
+            <div class="banner-student-info">
+              <div class="banner-avatar-wrap">
+                <img id="card-avatar-img" class="banner-avatar-img" src="assets/original.jpg" alt="Avatar" />
+              </div>
+              <div class="banner-name-block">
+                <span id="card-index-tag" class="banner-tag">01 / 35 • 11B2</span>
+                <h2 id="card-student-name" class="banner-name">Tên Học Sinh</h2>
+              </div>
+            </div>
+            <div id="card-role-subtag" class="banner-status-badge">
+              ✨ Video Tri Ân 20/10
+            </div>
+          </div>
+
+          <!-- Chi tiết 3: Khung phát Video Hoàng Gia Nghệ Thuật -->
+          <div id="royal-video-frame" class="royal-video-frame stagger-3">
+            <div class="frame-corner top-left">🌸</div>
+            <div class="frame-corner top-right">🌸</div>
+            <div class="frame-corner bottom-left">🌸</div>
+            <div class="frame-corner bottom-right">🌸</div>
+
+            <div class="video-inner-box">
+              <video id="active-video-player" class="active-video-element" controls playsinline></video>
+
+              <!-- Màn hình chờ khi chưa có file video -->
+              <div id="video-placeholder-card" class="video-placeholder-card">
+                <div class="card-video-icon">🎬</div>
+                <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">Video Tri Ân Bố Mẹ</h3>
+                <p style="font-size: 13.5px; color: #cbd5e1; max-width: 480px; margin-bottom: 18px;">
+                  Video kỷ niệm của bạn học sinh gửi đến Bố Mẹ nhân dịp 20/10
+                </p>
+                <label for="local-video-input" class="upload-video-trigger" title="Nhấp vào để chọn file video từ máy bạn và xem ngay">
+                  <span>📂</span> Chọn video từ máy tính để phát ngay
+                </label>
+                <div style="font-size: 11.5px; color: #94a3b8; margin-top: 12px;">
+                  (Hoặc chép file video vào thư mục <code>videos/</code> theo tên trong hướng dẫn)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chi tiết 4: Thanh điều khiển chuyển trang video & Tương tác -->
+          <div class="theater-controls-bar stagger-4">
+            <button class="nav-video-btn" onclick="prevVideo()" title="Xem bạn trước (Phím mũi tên trái)">
+              <span>◀</span> Bạn Trước
+            </button>
+            <button class="heart-react-btn" onclick="sendLoveHeart(event)" title="Gửi tim yêu thương đến con">
+              <span>💖</span> Gửi Tim Yêu Thương
+            </button>
+            <button class="nav-video-btn" onclick="nextVideo()" title="Xem bạn tiếp theo (Phím mũi tên phải)">
+              Bạn Sau <span>▶</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BĂNG CHUYỀN CHỌN BẤT KỲ AI ĐỂ XEM VIDEO (CAROUSEL)
+         ==================================================================== -->
+    <div class="student-carousel-box">
+      <div class="carousel-title-row">
+        <span class="carousel-title">✨ Chọn bất kỳ ai để xem video tri ân (35 thành viên)</span>
+        <button class="open-all-modal-btn" onclick="openAllModal()">
+          🔍 Xem tất cả & Tìm kiếm
+        </button>
+      </div>
+      <div id="avatar-scroll-container" class="avatar-scroll-container">
+        <!-- Danh sách học sinh được tạo tự động bởi JavaScript -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ====================================================================
+       BONG BÓNG LỜI NÓI (NẰM Ở ROOT BODY - KHÔNG BAO GIỜ BỊ CHE KHUẤT)
+       ==================================================================== -->
+  <div id="speech-bubble" class="speech-bubble">
+    <div class="bubble-header">
+      <img id="bubble-avatar-img" class="bubble-avatar" src="assets/original.jpg" alt="Avatar" />
+      <div class="bubble-meta">
+        <div id="bubble-student-name" class="bubble-name">Tên học sinh</div>
+      </div>
+    </div>
+    <div id="bubble-greeting-text" class="bubble-message">
+      Con chúc Mẹ ngày 20/10 luôn tràn đầy niềm vui và sức khỏe!
+    </div>
+    <button id="bubble-view-video-btn" class="bubble-action-btn">
+      <span>🎬</span> Xem Video Tri Ân Của Con
+    </button>
+  </div>
+
+  <!-- Modal xem danh sách cả lớp & tìm kiếm nhanh -->
+  <div id="modal-all-students" class="modal-overlay" onclick="if(event.target === this) closeAllModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Danh Sách Thành Viên Lớp</h3>
+        <button class="modal-close-btn" onclick="closeAllModal()">✕</button>
+      </div>
+      <div class="modal-search-box">
+        <input type="text" id="modal-search-input" class="modal-search-input" placeholder="🔍 Nhập tên bạn muốn tìm kiếm..." />
+      </div>
+      <div id="modal-grid-body" class="modal-grid-body">
+        <!-- Render bởi JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Thẻ input file ẩn để tải video thử nghiệm từ máy tính -->
+  <input type="file" id="local-video-input" accept="video/mp4,video/webm,video/mov,video/mkv" style="display: none;" />
+  <audio id="bg-audio" src="nhac.mp3" loop preload="auto"></audio>
+
+  <!-- Nạp tệp dữ liệu và mã nguồn ứng dụng -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
